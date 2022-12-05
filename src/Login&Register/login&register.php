@@ -55,17 +55,30 @@
 
     ?>
 
-    <h2>Register</h2>
+<h2>Register</h2>
     <form method="post" action="">
         <input type="text" name="registerUsername"  placeholder="username"><br>
         <input type="password" name="registerPassword" placeholder="password"><br>
+        <input type="password" name="registerPassword2" placeholder="Repeat password"><br>
         <input type="submit" name="submit" value="Register">
     </form>
     <?php
         if(isset($_POST["submit"])){
-            $queryUsers = $pdo->prepare("INSERT INTO users (username, password) VALUES ('".$_POST["registerUsername"]."', sha2('".$_POST["registerPassword"]."','256')); ");
-            $queryUsers->execute();
-            $rowUsers = $queryUsers->fetch();
+            if($_POST["registerPassword"]==$_POST["registerPassword2"]){
+                $queryUsers = $pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
+
+                $nombre = $_POST["registerUsername"];
+                $contr = hash("sha256",$_POST["registerPassword"]);
+                $queryUsers->bindParam(1, $nombre);
+                $queryUsers->bindParam(2, $contr);
+                
+                $queryUsers->execute();
+                $rowUsers = $queryUsers->fetch();
+            }
+            else{
+                echo "<p>Las contraseñas no coinciden</p>";
+            }
+            
         }
         
 
